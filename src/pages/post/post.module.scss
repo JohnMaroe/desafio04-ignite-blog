@@ -6,9 +6,7 @@
   }
 
   div {
-    display: flex;
-    justify-content: left;
-    align-items: center;
+    position: relative;
     margin: 25px 0 60px;
 
     span {
@@ -23,10 +21,16 @@
     svg {
       margin-right: 0.5rem;
     }
+
+    p {
+      margin-top: 0.75rem;
+    }
   }
 }
 
 .post {
+  margin-bottom: 2rem;
+
   h2 {
     color: var(--white);
     font-weight: bold;
@@ -38,7 +42,7 @@
     margin-bottom: 1rem;
 
     &:last-child {
-      margin-bottom: 3.5rem;
+      margin-bottom: 2.5rem;
     }
   }
 }
@@ -50,4 +54,36 @@
   background-repeat: no-repeat;
 
   margin-bottom: 3rem;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+
+  border-top: 1px solid var(--gray-100);
+  padding: 1.25rem;
+  padding-top: 3rem;
+  margin-bottom: 2rem;
+
+  a {
+    position: relative;
+
+    p {
+      color: var(--white);
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+  
+    span {
+      color: var(--pink);
+      font-size: 0.8rem;
+    }
+
+    svg {
+      position: absolute;
+      left: -2rem;
+      top: 1rem;
+    }
+  }
 }

@@ -1,8 +1,9 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
+import { FiCalendar, FiUser, FiClock, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 import Header from '../../components/Header';
 
@@ -18,6 +19,8 @@ import styles from './post.module.scss';
 
 interface Post {
   first_publication_date: string | null;
+  last_publication_date: string | null;
+  id: string;
   data: {
     title: string;
     banner: {
@@ -35,9 +38,23 @@ interface Post {
 
 interface PostProps {
   post: Post;
+  navigation: {
+    prevPost: {
+      uid: string;
+      data: {
+        title: string;
+      };
+    }[];
+    nextPost: {
+      uid: string;
+      data: {
+        title: string;
+      };
+    }[];
+  };
 }
 
-export default function Post({ post }: PostProps) {
+export default function Post({ post, navigation }: PostProps) {
   const { isFallback } = useRouter();
 
   if (isFallback) {
@@ -87,7 +104,22 @@ export default function Post({ post }: PostProps) {
             <FiClock />
             {readingTime} min
           </span>
+
+          {
+            post.last_publication_date && (
+              <p>* editado em 
+                {
+                  format(
+                    new Date(post.last_publication_date),
+                    " d MMM y', às' HH:mm",
+                    { locale: ptBR, }
+                  )
+                }
+              </p>
+            )
+          }
         </div>
+        
 
         {
           post?.data.content.map(content => (
@@ -101,6 +133,33 @@ export default function Post({ post }: PostProps) {
             </section>
           ))
         }
+
+        <footer className={styles.footer}>
+          {
+            navigation.prevPost.length > 0 && (
+              <Link href={navigation.prevPost[0].uid}>
+                <a>
+                  <FiChevronLeft />
+                  <p>{navigation.prevPost[0].data.title}</p>
+                  <span>Post anterior</span>
+                </a>
+              </Link>
+            )
+          }
+
+          {
+            navigation.nextPost.length > 0 && (
+              <Link href={navigation.nextPost[0].uid}>
+                <a>
+                  <FiChevronRight />
+                  <p>{navigation.nextPost[0].data.title}</p>
+                  <span>Próximo post</span>
+                </a>
+              </Link>
+            )
+          }
+        </footer>
+
       </main>
     </>
   );
@@ -137,9 +196,31 @@ export const getStaticProps: GetStaticProps = async (context) => {
     fetch: ['post.title', 'post.banner', 'post.author', 'post.content'],
   });
 
+  const prevPost = await prismic.query(
+    [Prismic.Predicates.at('document.type', 'posts')],
+    {
+      pageSize: 1,
+      after: post.id,
+      orderings: '[document.first_publication_date]',
+    }
+  );
+
+  const nextPost = await prismic.query(
+    [Prismic.Predicates.at('document.type', 'posts')],
+    {
+      pageSize: 1,
+      after: post.id,
+      orderings: '[document.last_publication_date desc]',
+    }
+  );
+
   return {
     props: {
-      post
+      post,
+      navigation: {
+        prevPost: prevPost?.results,
+        nextPost: nextPost?.results,
+      },
     },
     revalidate: 60 * 60 * 24, // 1 day
   }
