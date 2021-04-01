@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 
 import { FiCalendar, FiUser, FiClock, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
+import Comments from '../../components/Comments';
 import Header from '../../components/Header';
 
 import { format } from 'date-fns';
@@ -159,6 +160,8 @@ export default function Post({ post, navigation }: PostProps) {
             )
           }
         </footer>
+
+        <Comments />
 
       </main>
     </>
